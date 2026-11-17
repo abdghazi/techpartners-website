@@ -1,52 +1,87 @@
 import Link from "next/link";
+import { Brand } from "@/components/brand";
+import { Icon } from "@/components/icons";
 import { services, site } from "@/content/site";
+
+const company = [
+  { href: "/approach", label: "Our approach" },
+  { href: "/about", label: "About us" },
+  { href: "/contact", label: "Request a proposal" },
+];
 
 export function SiteFooter() {
   return (
     <footer className="mt-auto bg-navy-deep text-white">
-      <div className="mx-auto grid max-w-6xl gap-10 px-6 py-12 sm:grid-cols-[1.1fr_1fr_1fr]">
+      <div className="mx-auto grid max-w-7xl gap-12 px-6 pt-16 pb-12 md:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
         <div>
-          <p className="font-display text-2xl font-semibold">{site.name}</p>
-          <p className="mt-2 text-sm tracking-[0.14em] text-white/60 uppercase">
-            {site.tagline}
+          <Brand tone="dark" />
+          <p className="mt-5 max-w-xs text-sm leading-6 text-white/60">
+            IT consultancy for managed services, outsourcing, cybersecurity,
+            ERP, and AI. {site.tagline}.
           </p>
-          <a href={site.phoneHref} className="mt-4 inline-block text-sm hover:text-teal">
-            {site.phone}
-          </a>
         </div>
-        <div>
-          <p className="text-xs tracking-[0.16em] text-white/50 uppercase">Services</p>
-          <ul className="mt-3 space-y-2 text-sm">
-            {services.map((service) => (
-              <li key={service.id}>
-                <Link href={`/services#${service.id}`} className="hover:text-teal">
-                  {service.title}
-                </Link>
-              </li>
+        <FooterColumn title="Run and protect">
+          {services
+            .filter((s) => s.group === "run")
+            .map((s) => (
+              <FooterLink key={s.id} href={`/services#${s.id}`}>
+                {s.title}
+              </FooterLink>
             ))}
-          </ul>
-        </div>
-        <div>
-          <p className="text-xs tracking-[0.16em] text-white/50 uppercase">Firm</p>
-          <ul className="mt-3 space-y-2 text-sm">
-            <li>
-              <Link href="/approach" className="hover:text-teal">
-                Approach
-              </Link>
-            </li>
-            <li>
-              <Link href="/about" className="hover:text-teal">
-                About
-              </Link>
-            </li>
-            <li>
-              <Link href="/contact" className="hover:text-teal">
-                Request a proposal
-              </Link>
-            </li>
-          </ul>
+        </FooterColumn>
+        <FooterColumn title="Build">
+          {services
+            .filter((s) => s.group === "build")
+            .map((s) => (
+              <FooterLink key={s.id} href={`/services#${s.id}`}>
+                {s.title}
+              </FooterLink>
+            ))}
+        </FooterColumn>
+        <FooterColumn title="Company">
+          {company.map((item) => (
+            <FooterLink key={item.href} href={item.href}>
+              {item.label}
+            </FooterLink>
+          ))}
+          <li>
+            <a
+              href={site.phoneHref}
+              className="inline-flex items-center gap-2 text-white/80 transition hover:text-teal"
+            >
+              <Icon name="phone" className="size-4 text-teal" />
+              {site.phone}
+            </a>
+          </li>
+        </FooterColumn>
+      </div>
+      <div className="border-t border-white/10">
+        <div className="mx-auto flex max-w-7xl flex-col gap-2 px-6 py-6 text-xs text-white/50 sm:flex-row sm:items-center sm:justify-between">
+          <p>
+            © {site.year} {site.name}. All rights reserved.
+          </p>
+          <p className="tracking-[0.16em] uppercase">{site.tagline}</p>
         </div>
       </div>
     </footer>
+  );
+}
+
+function FooterColumn({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <p className="text-xs font-semibold tracking-[0.16em] text-white/45 uppercase">{title}</p>
+      <ul className="mt-5 space-y-3 text-sm">{children}</ul>
+    </div>
+  );
+}
+
+function FooterLink({ href, children }: { href: string; children: React.ReactNode }) {
+  return (
+    <li>
+      <Link href={href} className="text-white/80 transition hover:text-teal">
+        {children}
+      </Link>
+    </li>
   );
 }

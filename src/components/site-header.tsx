@@ -1,9 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { Brand } from "@/components/brand";
+import { Icon } from "@/components/icons";
 import { nav, site } from "@/content/site";
 
 function isActive(pathname: string, href: string) {
@@ -14,76 +15,105 @@ function isActive(pathname: string, href: string) {
 export function SiteHeader() {
   const pathname = usePathname();
   const [openPath, setOpenPath] = useState<string | null>(null);
+  const [scrolled, setScrolled] = useState(false);
   const open = openPath === pathname;
 
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   return (
-    <header className="sticky top-0 z-20 border-b border-line bg-paper/95 backdrop-blur">
-      <div className="h-1 bg-gradient-to-r from-navy to-teal" />
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-3">
-        <Link href="/" className="shrink-0">
-          <Image
-            src="/logo.jpg"
-            alt={site.name}
-            width={280}
-            height={120}
-            priority
-            className="h-14 w-auto"
-          />
-        </Link>
-        <nav className="hidden items-center gap-6 md:flex" aria-label="Primary">
-          {nav.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`text-sm font-medium ${
-                isActive(pathname, item.href)
-                  ? "text-navy"
-                  : "text-muted hover:text-foreground"
-              }`}
-              aria-current={isActive(pathname, item.href) ? "page" : undefined}
-            >
-              {item.label}
-            </Link>
-          ))}
+    <header
+      className={`sticky top-0 z-30 border-b bg-white/90 backdrop-blur-lg transition-shadow ${
+        scrolled || open ? "border-line shadow-sm" : "border-transparent"
+      }`}
+    >
+      <div className="mx-auto flex h-[4.5rem] max-w-7xl items-center justify-between gap-6 px-6">
+        <Brand />
+        <nav className="hidden items-center gap-1 md:flex" aria-label="Primary">
+          {nav.map((item) => {
+            const active = isActive(pathname, item.href);
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                aria-current={active ? "page" : undefined}
+                className={`rounded-md px-3.5 py-2 text-sm font-medium transition ${
+                  active ? "text-navy" : "text-muted hover:text-navy-deep"
+                }`}
+              >
+                {item.label}
+                <span
+                  className={`mx-auto mt-0.5 block h-0.5 rounded-full bg-teal transition-all ${
+                    active ? "w-full" : "w-0"
+                  }`}
+                />
+              </Link>
+            );
+          })}
+        </nav>
+        <div className="hidden items-center gap-5 md:flex">
+          <a
+            href={site.phoneHref}
+            className="hidden items-center gap-2 text-sm font-medium text-navy-deep hover:text-navy lg:flex"
+          >
+            <Icon name="phone" className="size-4 text-teal-deep" />
+            {site.phone}
+          </a>
           <Link
             href="/contact"
-            className="rounded-full bg-navy px-4 py-2 text-sm font-medium text-white hover:bg-navy-deep"
+            className="rounded-lg bg-navy px-4 py-2.5 text-sm font-semibold text-white shadow-sm shadow-navy/20 transition hover:bg-navy-deep"
           >
             Request a proposal
           </Link>
-        </nav>
+        </div>
         <button
           type="button"
-          className="rounded-md border border-line px-3 py-2 text-sm font-medium text-navy md:hidden"
+          className="flex size-10 items-center justify-center rounded-lg border border-line text-navy md:hidden"
           aria-expanded={open}
           aria-controls="mobile-nav"
+          aria-label={open ? "Close menu" : "Open menu"}
           onClick={() => setOpenPath(open ? null : pathname)}
         >
-          {open ? "Close" : "Menu"}
+          <Icon name={open ? "close" : "menu"} className="size-5" />
         </button>
       </div>
       {open ? (
         <nav
           id="mobile-nav"
-          className="flex flex-col gap-1 border-t border-line px-6 py-4 md:hidden"
+          className="border-t border-line bg-white px-6 pt-3 pb-6 md:hidden"
           aria-label="Primary"
         >
-          {nav.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="rounded-md px-2 py-2 text-sm font-medium text-foreground hover:bg-background"
-              aria-current={isActive(pathname, item.href) ? "page" : undefined}
-            >
-              {item.label}
-            </Link>
-          ))}
+          <ul className="flex flex-col">
+            {nav.map((item) => (
+              <li key={item.href}>
+                <Link
+                  href={item.href}
+                  aria-current={isActive(pathname, item.href) ? "page" : undefined}
+                  className="flex items-center justify-between border-b border-line py-3.5 text-base font-medium text-navy-deep"
+                >
+                  {item.label}
+                  <Icon name="arrowRight" className="size-4 text-muted" />
+                </Link>
+              </li>
+            ))}
+          </ul>
           <Link
             href="/contact"
-            className="mt-2 rounded-full bg-navy px-4 py-2 text-center text-sm font-medium text-white"
+            className="mt-5 block rounded-lg bg-navy px-4 py-3 text-center text-sm font-semibold text-white"
           >
             Request a proposal
           </Link>
+          <a
+            href={site.phoneHref}
+            className="mt-3 flex items-center justify-center gap-2 py-2 text-sm font-medium text-navy"
+          >
+            <Icon name="phone" className="size-4" />
+            {site.phone}
+          </a>
         </nav>
       ) : null}
     </header>

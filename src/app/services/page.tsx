@@ -1,57 +1,115 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { services } from "@/content/site";
+import { CtaBand } from "@/components/cta-band";
+import { Icon } from "@/components/icons";
+import { PageBanner } from "@/components/page-banner";
+import { CheckItem } from "@/components/ui";
+import { serviceGroups, services } from "@/content/site";
 
 export const metadata: Metadata = {
   title: "Services",
   description:
-    "Managed services, outsourcing, security, ERP, AI, and custom software. Each engagement starts with a written plan.",
+    "Managed services, IT outsourcing, cybersecurity, ERP, custom software, and AI. Each engagement starts with a written plan.",
 };
 
 export default function ServicesPage() {
   return (
-    <main className="mx-auto max-w-6xl px-6 py-16">
-      <p className="text-sm font-medium tracking-[0.16em] text-teal-deep uppercase">
-        Services
-      </p>
-      <h1 className="mt-3 max-w-3xl font-display text-4xl font-semibold text-navy-deep sm:text-5xl">
-        Run it, protect it, or build it. The work follows the plan.
-      </h1>
-      <p className="mt-4 max-w-2xl text-lg leading-8 text-muted">
-        We take on managed services, outsourcing, security, ERP, and the
-        software and AI systems those operations sit on.
-      </p>
-      <div className="mt-12 grid gap-6 lg:grid-cols-2">
-        {services.map((service, index) => (
-          <article
-            key={service.id}
-            id={service.id}
-            className="scroll-mt-28 rounded-3xl border border-line bg-paper p-8 shadow-sm"
-          >
-            <p className="text-xs font-medium tracking-[0.16em] text-teal-deep uppercase">
-              0{index + 1} · {service.kicker}
-            </p>
-            <h2 className="mt-3 font-display text-2xl font-semibold text-navy">
-              {service.title}
-            </h2>
-            <p className="mt-3 text-muted">{service.summary}</p>
-            <p className="mt-6 text-sm font-medium text-navy">The problem</p>
-            <p className="mt-2 text-sm leading-6 text-muted">{service.problem}</p>
-            <p className="mt-6 text-sm font-medium text-navy">What you get</p>
-            <ul className="mt-2 list-disc space-y-2 pl-5 text-sm leading-6 text-muted">
-              {service.deliver.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
-          </article>
-        ))}
-      </div>
-      <Link
-        href="/contact"
-        className="mt-10 inline-block rounded-full bg-navy px-5 py-2.5 text-sm font-medium text-white hover:bg-navy-deep"
+    <main>
+      <PageBanner
+        eyebrow="Services"
+        title="Run it, protect it, or build it. One team, one plan."
       >
-        Request a proposal
-      </Link>
+        <p>
+          We cover the full technology lifecycle: operating and securing the
+          systems you already have, and building the software and AI that comes
+          next.
+        </p>
+      </PageBanner>
+
+      <div className="mx-auto grid max-w-7xl gap-12 px-6 py-20 lg:grid-cols-[16rem_1fr] lg:gap-16">
+        <aside className="hidden lg:block">
+          <nav className="sticky top-28 space-y-8" aria-label="Services">
+            {serviceGroups.map((group) => (
+              <div key={group.id}>
+                <p className="text-xs font-semibold tracking-[0.16em] text-muted uppercase">
+                  {group.title}
+                </p>
+                <ul className="mt-3 space-y-1 border-l border-line">
+                  {services
+                    .filter((s) => s.group === group.id)
+                    .map((s) => (
+                      <li key={s.id}>
+                        <a
+                          href={`#${s.id}`}
+                          className="-ml-px block border-l-2 border-transparent py-1.5 pl-4 text-sm font-medium text-muted transition hover:border-teal hover:text-navy"
+                        >
+                          {s.title}
+                        </a>
+                      </li>
+                    ))}
+                </ul>
+              </div>
+            ))}
+          </nav>
+        </aside>
+
+        <div className="space-y-20">
+          {serviceGroups.map((group) => (
+            <section key={group.id} aria-labelledby={`group-${group.id}`}>
+              <div className="border-b border-line pb-5">
+                <h2
+                  id={`group-${group.id}`}
+                  className="font-display text-2xl font-bold text-navy-deep"
+                >
+                  {group.title}
+                </h2>
+                <p className="mt-1 text-muted">{group.text}</p>
+              </div>
+              <div className="mt-8 space-y-6">
+                {services
+                  .filter((s) => s.group === group.id)
+                  .map((service) => (
+                    <article
+                      key={service.id}
+                      id={service.id}
+                      className="scroll-mt-28 rounded-2xl border border-line bg-white p-8 transition hover:shadow-lg hover:shadow-navy/5 md:p-10"
+                    >
+                      <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
+                        <span className="flex size-14 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-navy to-teal text-white shadow-md shadow-navy/20">
+                          <Icon name={service.icon} className="size-7" />
+                        </span>
+                        <div>
+                          <p className="text-xs font-semibold tracking-[0.14em] text-teal-deep uppercase">
+                            {service.kicker}
+                          </p>
+                          <h3 className="mt-1.5 font-display text-2xl font-bold text-navy-deep">
+                            {service.title}
+                          </h3>
+                          <p className="mt-3 text-lg leading-8 text-muted">{service.summary}</p>
+                        </div>
+                      </div>
+                      <div className="mt-8 grid gap-6 md:grid-cols-[0.9fr_1.1fr]">
+                        <div className="rounded-xl bg-background p-6">
+                          <p className="text-sm font-semibold text-navy-deep">The challenge</p>
+                          <p className="mt-3 leading-7 text-muted">{service.problem}</p>
+                        </div>
+                        <div className="p-1 md:p-6">
+                          <p className="text-sm font-semibold text-navy-deep">What we deliver</p>
+                          <ul className="mt-4 space-y-3 text-[15px] leading-6 text-foreground">
+                            {service.deliver.map((item) => (
+                              <CheckItem key={item}>{item}</CheckItem>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                    </article>
+                  ))}
+              </div>
+            </section>
+          ))}
+        </div>
+      </div>
+
+      <CtaBand title="Not sure which service fits?" text="Describe the problem. We will tell you what we would do first, what can wait, and who would do the work." />
     </main>
   );
 }
